@@ -10,13 +10,57 @@ import Chats from '@assets/icons/chats.svg'
 import TodoList from '@assets/icons/todo-lists.svg'
 import Search from '@assets/icons/search.svg'
 import Loading from '@assets/icons/loading.svg'
+import RedDot from '@assets/icons/red-dot.svg'
 
 const Home = () => {
   const [isExpand, setIsExpand] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const toggleExpand = () => {
     setIsExpand(!isExpand)
   }
+
+  const chatLists = [
+    {
+      type: 'group',
+      subject: '109220-Naturalization',
+      datetime: '02/06/2021 10:45',
+      last: {
+        person: 'Cameron Philips',
+        message: 'Please check this out!'
+      },
+      isRead: false
+    },
+    {
+      type: 'group',
+      subject: 'Jeannette Moraima Guaman Chamba (Hutto I-589) [ Hutto Follow Up - Brief Service ]',
+      datetime: '02/06/2021 10:45',
+      last: {
+        person: 'Ellen',
+        message: 'Hey, please read.'
+      },
+      isRead: true
+    },
+    {
+      type: 'group',
+      subject: '8405-Diana SALAZAR MUNGUIA',
+      datetime: '01/06/2021 12:19',
+      last: {
+        person: 'Cameron Phillips',
+        message: 'I understand your initial concerns and thats very valid, Elizabeth. But you ...'
+      },
+      isRead: true
+    },
+    {
+      type: 'personal',
+      subject: 'FastVisa Support',
+      datetime: '01/06/2021 12:19',
+      last: {
+        message: 'Hey there! Welcome to your inbox.'
+      },
+      isRead: true
+    }
+  ];
 
   return (
     <>
@@ -28,7 +72,7 @@ const Home = () => {
       </Head>
       <main>
         <QuickWrapper>
-          <div className="flex flex-col bg-white rounded-md py-5 px-8 w-[500px] h-[500px]">
+          <div className="flex flex-col bg-white rounded-md py-5 px-8 w-[570px] h-[570px]">
             <div className="relative w-full">
               <input type="text" className="border border-primary-3 rounded-md w-full px-5 py-1 text-sm placeholder:text-black" placeholder="Search" />
               <Image
@@ -39,17 +83,69 @@ const Home = () => {
                 priority
               />
             </div>
-            <div className="flex flex-1 justify-center items-center">
-              <div className="flex flex-col items-center gap-3">
-                <Image
-                  className="animate-spin"
-                  src={Loading}
-                  alt="loading-icon"
-                  quality={100}
-                  priority
-                />
-                <strong className="text-primary-2">Loading Chats...</strong>
-              </div>
+            <div className="flex-1 overflow-auto">
+              { isLoading ?
+                  <div className="flex justify-center items-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <Image
+                        className="animate-spin"
+                        src={Loading}
+                        alt="loading-icon"
+                        quality={100}
+                        priority
+                      />
+                      <strong className="text-primary-2">Loading Chats...</strong>
+                    </div>
+                  </div>
+                :
+                  <div className="flex flex-col">
+                    {chatLists.map((list) => (
+                      <div className="flex flex-col w-full border-b border-primary-3 pt-6 pb-7">
+                        <div className="flex flex-row gap-7">
+                          <div className="flex flex-col">
+                            {list.type == 'group' ?
+                              <>
+                                <div className="z-10 translate-x-4 bg-primary rounded-full p-2.5">
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 0C4.3425 0 3 1.3425 3 3C3 4.6575 4.3425 6 6 6C7.6575 6 9 4.6575 9 3C9 1.3425 7.6575 0 6 0ZM7.5 3C7.5 2.175 6.825 1.5 6 1.5C5.175 1.5 4.5 2.175 4.5 3C4.5 3.825 5.175 4.5 6 4.5C6.825 4.5 7.5 3.825 7.5 3ZM10.5 10.5C10.35 9.9675 8.025 9 6 9C3.9825 9 1.6725 9.96 1.5 10.5H10.5ZM0 10.5C0 8.505 3.9975 7.5 6 7.5C8.0025 7.5 12 8.505 12 10.5V12H0V10.5Z" fill="white"/>
+                                  </svg>
+                                </div>
+                                <div className="z-0 -translate-y-full bg-primary-4 rounded-full p-2.5">
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 0C4.3425 0 3 1.3425 3 3C3 4.6575 4.3425 6 6 6C7.6575 6 9 4.6575 9 3C9 1.3425 7.6575 0 6 0ZM7.5 3C7.5 2.175 6.825 1.5 6 1.5C5.175 1.5 4.5 2.175 4.5 3C4.5 3.825 5.175 4.5 6 4.5C6.825 4.5 7.5 3.825 7.5 3ZM10.5 10.5C10.35 9.9675 8.025 9 6 9C3.9825 9 1.6725 9.96 1.5 10.5H10.5ZM0 10.5C0 8.505 3.9975 7.5 6 7.5C8.0025 7.5 12 8.505 12 10.5V12H0V10.5Z" fill="#0000008A"/>
+                                  </svg>
+                                </div>
+                              </>
+                              :
+                              <div className="flex justify-center items-center translate-x-2 bg-primary rounded-full p-1 w-7 h-7">
+                                <strong className="text-white">{ Array.from(list.subject)[0] }</strong>
+                              </div>
+                            }
+                          </div>
+                          <div className="flex flex-col w-full text-sm">
+                            <div className="flex flex-row gap-4">
+                              <div className="text-primary font-bold">{list.subject}</div>
+                              <div className="text-primary-2 whitespace-nowrap">{list.datetime}</div>
+                            </div>
+                            {list.type == 'group' && <strong>{list.last.person} :</strong>}
+                            <div className="flex flex-row items-center justify-between">
+                              <div className="text-primary-2">{list.last.message}</div>
+                              {!list.isRead &&
+                                <Image
+                                  className="animate-spin"
+                                  src={RedDot}
+                                  alt="reddot-icon"
+                                  quality={100}
+                                  priority
+                                />
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+              }
             </div>
           </div>
           <div className="flex flex-row justify-end gap-4">
