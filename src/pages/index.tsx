@@ -177,7 +177,7 @@ const Home = () => {
                                 }
                               </div>
                               <div className="flex flex-col bg-[#EEDCFF] p-2 rounded-md ml-2">
-                                <p className="mb-1">No worries. It will be completed ASAP. I've asked him yesterday.</p>
+                                <p className="mb-1">No worries. It will be completed ASAP. I`ve asked him yesterday.</p>
                                 <span>19:32</span>
                               </div>
                             </div>
@@ -245,7 +245,7 @@ const Home = () => {
                             <div className="text-left font-bold text-[#43B78D]">Obaidullah Amarkhil</div>
                             <div className="flex flex-row items-start">
                               <div className="flex flex-col bg-[#D2F2EA] p-2 rounded-md mr-2">
-                                <p className="mb-1">Morning. I'll try to do them. Thanks</p>
+                                <p className="mb-1">Morning. I`ll try to do them. Thanks</p>
                                 <span>19:32</span>
                               </div>
                               <Image
