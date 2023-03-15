@@ -2,6 +2,7 @@ import Image from 'next/image'
 
 interface IQuickProps {
   className?: string,
+  onHover?: string,
   onClick?: () => void,
   variant?: string,
   src: string,
@@ -12,7 +13,7 @@ interface IVariant {
   [key: string]: string;
 } 
 
-const Quick = ({ className = '', onClick, variant = 'primary', src, label }: IQuickProps) => {
+const Quick = ({ className = '' , onHover, onClick, variant = 'primary', src, label }: IQuickProps) => {
   const variantClasses: IVariant = {
     default: 'bg-default',
     primary: 'bg-primary',
@@ -23,7 +24,7 @@ const Quick = ({ className = '', onClick, variant = 'primary', src, label }: IQu
   return (
     <div className={`${className} flex flex-col items-center justify-end gap-2`}>
       { label && <span className="text-default">{label}</span> }
-      <button type="button" className={`${variantClasses[variant]} flex justify-center items-center rounded-full w-14 h-14 shadow-md`} onClick={onClick}>
+      <button type="button" className={`${variantClasses[variant]} flex justify-center items-center rounded-full w-14 h-14 shadow-md ${onHover}`} onClick={onClick}>
         <Image
           className="p-0.5"
           src={src}

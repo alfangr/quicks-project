@@ -4,24 +4,28 @@ import Image from 'next/image'
 
 import QuickWrapper from '@/components/Layout/QuickWrapper'
 import Quick from '@/components/Quick'
+import ChatList from '@/components/ChatList'
+import Chat from '@/components/Chat'
 
 import Lightning from '@assets/icons/lightning.svg'
 import Chats from '@assets/icons/chats.svg'
 import TodoList from '@assets/icons/todo-lists.svg'
-import Search from '@assets/icons/search.svg'
+import ArrowBack from '@assets/icons/arrow-back.svg'
+import Close from '@assets/icons/cross.svg'
+import ThreeDots from '@assets/icons/three-dots.svg'
+import LoadingBlue from '@assets/icons/loading-blue.svg'
 import Loading from '@assets/icons/loading.svg'
-import RedDot from '@assets/icons/red-dot.svg'
 
 const Home = () => {
   const [isExpand, setIsExpand] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
-  const toggleExpand = () => {
-    setIsExpand(!isExpand)
-  }
+  const [activeQuick, setActiveQuick] = useState('')
+  const [selectedChat, setSelectedChat] = useState<any[]>([])
+  const [isExpandAction, setIsExpandAction] = useState(false)
 
   const chatLists = [
     {
+      id: 1,
       type: 'group',
       subject: '109220-Naturalization',
       datetime: '02/06/2021 10:45',
@@ -32,6 +36,7 @@ const Home = () => {
       isRead: false
     },
     {
+      id: 2,
       type: 'group',
       subject: 'Jeannette Moraima Guaman Chamba (Hutto I-589) [ Hutto Follow Up - Brief Service ]',
       datetime: '02/06/2021 10:45',
@@ -42,6 +47,7 @@ const Home = () => {
       isRead: true
     },
     {
+      id: 3,
       type: 'group',
       subject: '8405-Diana SALAZAR MUNGUIA',
       datetime: '01/06/2021 12:19',
@@ -52,6 +58,7 @@ const Home = () => {
       isRead: true
     },
     {
+      id: 4,
       type: 'personal',
       subject: 'FastVisa Support',
       datetime: '01/06/2021 12:19',
@@ -60,7 +67,47 @@ const Home = () => {
       },
       isRead: true
     }
-  ];
+  ]
+
+  const toggleQuickMenus = () => {
+    setActiveQuick('')
+    setIsExpand(!isExpand)
+  }
+
+  const toggleQuickActive = (menu: string) => {
+    setActiveQuick(menu)
+    setIsLoading(true)
+
+    const loadingTimer = setTimeout(() => {
+      setIsLoading(false)
+      clearTimeout(loadingTimer)
+    }, 1000)
+  }
+
+  const chatDetail = (id: number) => {
+    const selectedChat: any = chatLists.filter(function(chat) {
+      return chat.id === id;
+    });
+    setSelectedChat(selectedChat)
+  }
+
+  const goBack = () => {
+    if (activeQuick === 'chats') setSelectedChat([])
+    // if (activeQuick === 'todos') setSelectedChat([])
+  }
+
+  const closeQuick = () => {
+    if (activeQuick === 'chats') {
+      setSelectedChat([])
+      setActiveQuick('')
+      setIsExpand(false)
+    }
+    // if (activeQuick === 'todos') setSelectedChat([])
+  }
+
+  const toggleActionMenus = () => {
+    setIsExpandAction(!isExpandAction)
+  }
 
   return (
     <>
@@ -72,20 +119,220 @@ const Home = () => {
       </Head>
       <main>
         <QuickWrapper>
-          <div className="flex flex-col bg-white rounded-md py-5 px-8 w-[570px] h-[570px]">
-            <div className="relative w-full">
-              <input type="text" className="border border-primary-3 rounded-md w-full px-5 py-1 text-sm placeholder:text-black" placeholder="Search" />
-              <Image
-                className="absolute right-5 top-2.5"
-                src={Search}
-                alt="search-icon"
-                quality={100}
-                priority
-              />
+          {activeQuick === 'chats' &&
+            <div className="flex flex-col bg-white rounded-md py-6 px-8 w-[570px] h-[570px]">
+              {selectedChat.length === 0 ?
+                <ChatList isLoading={isLoading}>
+                  {chatLists.map((chatList, chatKey) => (
+                    <Chat key={chatKey} chatList={chatList} onClick={() => chatDetail(chatList.id)} />
+                  ))}
+                </ChatList>
+                :
+                <div className="relative flex flex-col h-full">
+                  <div className="border-b pb-4 px-8 -mx-8">
+                    <div className="flex flex-row items-center justify-between">
+                        <div className="flex flex-row items-center gap-4">
+                          <button type="button" onClick={goBack}>
+                            <Image
+                              src={ArrowBack}
+                              alt="arrow-back-icon"
+                              quality={100}
+                            />
+                          </button>
+                          <div className="flex flex-col">
+                            <div className="text-base font-bold text-primary">I-589 - AMARKHIL, Obaidullah [Affirmative Filing with ZHN]</div>
+                            <span className="text-xs">3 Participants</span>
+                          </div>
+                        </div>
+                        <button type="button" onClick={closeQuick}>
+                          <Image
+                            src={Close}
+                            alt="arrow-back-icon"
+                            quality={100}
+                          />
+                        </button>
+                      </div>
+                  </div>
+                  {selectedChat[0].type === 'group' ?
+                    <div className="my-2 mb-12 h-full overflow-auto">
+                      <div className="flex flex-col gap-5 mr-6 text-primary-2 text-sm">
+                        <div className="flex justify-end">
+                          <div className="flex flex-col">
+                            <div className="text-right font-bold text-[#9B51E0]">You</div>
+                            <div className="flex flex-row items-start">
+                              <div className="relative">
+                                <button type="button" onClick={toggleActionMenus}>
+                                  <Image
+                                    className="pt-1"
+                                    src={ThreeDots}
+                                    alt="three-dots-icon"
+                                    quality={100}
+                                  />
+                                </button>
+                                {isExpandAction && 
+                                  <div className="flex flex-col w-[126px] bg-white absolute left-0 top-5 border border-[#BDBDBD] rounded-md">
+                                    <button type="button" className="p-2 text-left text-primary border-b border-[#BDBDBD]">Edit</button>
+                                    <button type="button" className="p-2 text-left text-secondary-3">Delete</button>
+                                  </div>
+                                }
+                              </div>
+                              <div className="flex flex-col bg-[#EEDCFF] p-2 rounded-md ml-2">
+                                <p className="mb-1">No worries. It will be completed ASAP. I've asked him yesterday.</p>
+                                <span>19:32</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-center border-t pt-4 mt-2 -mb-7">
+                          <h2 className="bg-white px-4 -mt-7 font-bold">Today June 09, 2021</h2>
+                        </div>
+                        <div className="max-w-[420px] flex justify-start">
+                          <div className="flex flex-col">
+                            <div className="text-left font-bold text-[#E5A443]">Mary Hilda</div>
+                            <div className="flex flex-row items-start">
+                              <div className="flex flex-col bg-[#FCEED3] p-2 rounded-md mr-2">
+                                <p className="mb-1">Hello Obaidullah, I will be your case advisor for case #029290. I have assigned some homework for you to fill. Please keep up with the due dates. Should you have any questions, you can message me anytime. Thanks.</p>
+                                <span>19:32</span>
+                              </div>
+                              <Image
+                                className="pt-1"
+                                src={ThreeDots}
+                                alt="three-dots-icon"
+                                quality={100}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
+                          <div className="flex flex-col">
+                            <div className="text-right font-bold text-[#9B51E0]">You</div>
+                            <div className="flex flex-row items-start">
+                              <Image
+                                className="pt-1"
+                                src={ThreeDots}
+                                alt="three-dots-icon"
+                                quality={100}
+                              />
+                              <div className="flex flex-col bg-[#EEDCFF] p-2 rounded-md ml-2">
+                                <p className="mb-1">Please contact Mary for questions regarding the case bcs she will be managing your forms from now on! Thanks Mary.</p>
+                                <span>19:32</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="max-w-[420px] flex justify-start">
+                          <div className="flex flex-col">
+                            <div className="text-left font-bold text-[#E5A443]">Mary Hilda</div>
+                            <div className="flex flex-row items-start">
+                              <div className="flex flex-col bg-[#FCEED3] p-2 rounded-md mr-2">
+                                <p className="mb-1">Sure thing, Claren</p>
+                                <span>19:32</span>
+                              </div>
+                              <Image
+                                className="pt-1"
+                                src={ThreeDots}
+                                alt="three-dots-icon"
+                                quality={100}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-center border-t border-secondary-3 pt-4 mt-2 -mb-7">
+                          <h2 className="bg-white px-4 -mt-7 font-bold text-secondary-3">New Message</h2>
+                        </div>
+                        <div className="max-w-[420px] flex justify-start">
+                          <div className="flex flex-col">
+                            <div className="text-left font-bold text-[#43B78D]">Obaidullah Amarkhil</div>
+                            <div className="flex flex-row items-start">
+                              <div className="flex flex-col bg-[#D2F2EA] p-2 rounded-md mr-2">
+                                <p className="mb-1">Morning. I'll try to do them. Thanks</p>
+                                <span>19:32</span>
+                              </div>
+                              <Image
+                                className="pt-1"
+                                src={ThreeDots}
+                                alt="three-dots-icon"
+                                quality={100}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-center">
+                          <h2 className="bg-[#E9F3FF] font-bold text-primary py-1 px-4 rounded-md">New Message</h2>
+                        </div>
+                      </div>
+                    </div>
+                    :
+                    <div className="my-2 mb-24 h-full overflow-auto">
+                      <div className="flex flex-col gap-5 mr-6 text-primary-2 text-sm">
+                        <div className="max-w-[420px] flex justify-start">
+                          <div className="flex flex-col">
+                            <div className="text-left font-bold text-primary">FastVisa Support</div>
+                            <div className="flex flex-row items-start">
+                              <div className="flex flex-col bg-[#F8F8F8] p-2 rounded-md mr-2">
+                                <p className="mb-1">Hey there. Welcome to your inbox! Contact us for more information and help about anything! We’ll send you a response as soon as possible.</p>
+                                <span>19:32</span>
+                              </div>
+                              <Image
+                                className="pt-1"
+                                src={ThreeDots}
+                                alt="three-dots-icon"
+                                quality={100}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
+                          <div className="flex flex-col">
+                            <div className="text-right font-bold text-[#9B51E0]">You</div>
+                            <div className="flex flex-row items-start">
+                              <Image
+                                className="pt-1"
+                                src={ThreeDots}
+                                alt="three-dots-icon"
+                                quality={100}
+                              />
+                              <div className="flex flex-col bg-[#EEDCFF] p-2 rounded-md ml-2">
+                                <p className="mb-1">Hi, I need help with something can you help me?</p>
+                                <span>19:32</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  <div className="flex flex-col gap-2 absolute left-0 bottom-0 w-full">
+                    {selectedChat[0].type === 'personal' &&
+                      <div className="flex flex-row items-center gap-3 py-1 px-3 bg-[#E9F3FF] rounded-md">
+                        <Image
+                          className="animate-spin"
+                          src={LoadingBlue}
+                          alt="loading-blue-icon"
+                          quality={100}
+                        />
+                        <p className="font-bold text-xs">Please wait while we connect you with one of our team ...</p>
+                      </div>
+                    }
+                    <div className="flex flex-row gap-3">
+                      <input type="text" className="border border-primary-3 rounded py-1 px-4 w-full" placeholder="Type a new message" />
+                      <button className="bg-primary text-white px-4 py-2 rounded">Send</button>
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
-            <div className="flex-1 overflow-auto">
-              { isLoading ?
-                  <div className="flex justify-center items-center">
+          }
+
+          {activeQuick === 'todos' &&
+            <div className="flex flex-col bg-white rounded-md py-6 px-8 w-[570px] h-[570px]">
+              <div className="flex flex-row justify-between">
+                <div>My task</div>
+                <div>New Task</div>
+              </div>
+              <div className="h-full overflow-auto">
+                {isLoading ?
+                  <div className="flex h-full justify-center items-center">
                     <div className="flex flex-col items-center gap-3">
                       <Image
                         className="animate-spin"
@@ -94,64 +341,146 @@ const Home = () => {
                         quality={100}
                         priority
                       />
-                      <strong className="text-primary-2">Loading Chats...</strong>
+                      <strong className="text-primary-2">Loading Task List ...</strong>
                     </div>
                   </div>
                 :
-                  <div className="flex flex-col">
-                    {chatLists.map((list) => (
-                      <div className="flex flex-col w-full border-b border-primary-3 pt-6 pb-7">
-                        <div className="flex flex-row gap-7">
-                          <div className="flex flex-col">
-                            {list.type == 'group' ?
-                              <>
-                                <div className="z-10 translate-x-4 bg-primary rounded-full p-2.5">
-                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 0C4.3425 0 3 1.3425 3 3C3 4.6575 4.3425 6 6 6C7.6575 6 9 4.6575 9 3C9 1.3425 7.6575 0 6 0ZM7.5 3C7.5 2.175 6.825 1.5 6 1.5C5.175 1.5 4.5 2.175 4.5 3C4.5 3.825 5.175 4.5 6 4.5C6.825 4.5 7.5 3.825 7.5 3ZM10.5 10.5C10.35 9.9675 8.025 9 6 9C3.9825 9 1.6725 9.96 1.5 10.5H10.5ZM0 10.5C0 8.505 3.9975 7.5 6 7.5C8.0025 7.5 12 8.505 12 10.5V12H0V10.5Z" fill="white"/>
-                                  </svg>
-                                </div>
-                                <div className="z-0 -translate-y-full bg-primary-4 rounded-full p-2.5">
-                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 0C4.3425 0 3 1.3425 3 3C3 4.6575 4.3425 6 6 6C7.6575 6 9 4.6575 9 3C9 1.3425 7.6575 0 6 0ZM7.5 3C7.5 2.175 6.825 1.5 6 1.5C5.175 1.5 4.5 2.175 4.5 3C4.5 3.825 5.175 4.5 6 4.5C6.825 4.5 7.5 3.825 7.5 3ZM10.5 10.5C10.35 9.9675 8.025 9 6 9C3.9825 9 1.6725 9.96 1.5 10.5H10.5ZM0 10.5C0 8.505 3.9975 7.5 6 7.5C8.0025 7.5 12 8.505 12 10.5V12H0V10.5Z" fill="#0000008A"/>
-                                  </svg>
-                                </div>
-                              </>
-                              :
-                              <div className="flex justify-center items-center translate-x-2 bg-primary rounded-full p-1 w-7 h-7">
-                                <strong className="text-white">{ Array.from(list.subject)[0] }</strong>
-                              </div>
-                            }
-                          </div>
-                          <div className="flex flex-col w-full text-sm">
-                            <div className="flex flex-row gap-4">
-                              <div className="text-primary font-bold">{list.subject}</div>
-                              <div className="text-primary-2 whitespace-nowrap">{list.datetime}</div>
-                            </div>
-                            {list.type == 'group' && <strong>{list.last.person} :</strong>}
-                            <div className="flex flex-row items-center justify-between">
-                              <div className="text-primary-2">{list.last.message}</div>
-                              {!list.isRead &&
-                                <Image
-                                  className="animate-spin"
-                                  src={RedDot}
-                                  alt="reddot-icon"
-                                  quality={100}
-                                  priority
-                                />
-                              }
-                            </div>
+                  <>
+                    <div className="flex flex-row gap-2 py-3 border-b border-[#828282]">
+                      <div>check</div>
+                      <div className="w-full flex flex-col">
+                        <div className="flex flex-row justify-between">
+                          <div>title todo</div>
+                          <div className="flex flex-row gap-2">
+                            <div>days left</div>
+                            <div>date</div>
+                            <div>three dots</div>
                           </div>
                         </div>
+                        <div className="flex flex-row gap-3">
+                          <div>timer icon</div>
+                          <div>datepicker</div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>edit icon</div>
+                          <p>description text</p>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-              }
+                    </div>
+                    <div className="flex flex-row gap-2 py-3 border-b border-[#828282]">
+                      <div>check</div>
+                      <div className="w-full flex flex-col">
+                        <div className="flex flex-row justify-between">
+                          <div>title todo</div>
+                          <div className="flex flex-row gap-2">
+                            <div>days left</div>
+                            <div>date</div>
+                            <div>three dots</div>
+                          </div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>timer icon</div>
+                          <div>datepicker</div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>edit icon</div>
+                          <p>description text</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-2 py-3 border-b border-[#828282]">
+                      <div>check</div>
+                      <div className="w-full flex flex-col">
+                        <div className="flex flex-row justify-between">
+                          <div>title todo</div>
+                          <div className="flex flex-row gap-2">
+                            <div>days left</div>
+                            <div>date</div>
+                            <div>three dots</div>
+                          </div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>timer icon</div>
+                          <div>datepicker</div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>edit icon</div>
+                          <p>description text</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-2 py-3 border-b border-[#828282]">
+                      <div>check</div>
+                      <div className="w-full flex flex-col">
+                        <div className="flex flex-row justify-between">
+                          <div>title todo</div>
+                          <div className="flex flex-row gap-2">
+                            <div>days left</div>
+                            <div>date</div>
+                            <div>three dots</div>
+                          </div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>timer icon</div>
+                          <div>datepicker</div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>edit icon</div>
+                          <p>description text</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-2 py-3 border-b border-[#828282]">
+                      <div>check</div>
+                      <div className="w-full flex flex-col">
+                        <div className="flex flex-row justify-between">
+                          <div>title todo</div>
+                          <div className="flex flex-row gap-2">
+                            <div>days left</div>
+                            <div>date</div>
+                            <div>three dots</div>
+                          </div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>timer icon</div>
+                          <div>datepicker</div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>edit icon</div>
+                          <p>description text</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-2 py-3 border-b border-[#828282]">
+                      <div>check</div>
+                      <div className="w-full flex flex-col">
+                        <div className="flex flex-row justify-between">
+                          <div>title todo</div>
+                          <div className="flex flex-row gap-2">
+                            <div>days left</div>
+                            <div>date</div>
+                            <div>three dots</div>
+                          </div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>timer icon</div>
+                          <div>datepicker</div>
+                        </div>
+                        <div className="flex flex-row gap-3">
+                          <div>edit icon</div>
+                          <p>description text</p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                }
+              </div>
             </div>
-          </div>
+          }
           <div className="flex flex-row justify-end gap-4">
-            <Quick className={`transition-all duration-700 ${isExpand && 'translate-x-10 absolute bottom-0 right-10 invisible'}`} src={TodoList} variant="default" label={`${!isExpand ? 'Task' : ''}`} />
-            <Quick className={`transition-all duration-700 ${isExpand && 'translate-x-10 absolute bottom-0 right-10 invisible'}`} src={Chats} variant="default" label={`${!isExpand ? 'Inbox' : ''}`} />
-            <Quick src={Lightning} onClick={toggleExpand} />
+            <Quick className={`transition-all duration-700 ${!isExpand && 'translate-x-10 absolute bottom-0 right-10 invisible'}`} src={TodoList} variant="default" label={`${isExpand ? 'Task' : ''}`} onClick={() => toggleQuickActive('todos')} />
+            <Quick className={`transition-all duration-700 ${!isExpand && 'translate-x-10 absolute bottom-0 right-10 invisible'}`} src={Chats} variant="default" label={`${isExpand ? 'Inbox' : ''}`} onClick={() => toggleQuickActive('chats')} />
+            <Quick src={Lightning} onClick={toggleQuickMenus} />
           </div>
         </QuickWrapper>
       </main>
